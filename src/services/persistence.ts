@@ -3,6 +3,7 @@ export const DIGICHAR_STORAGE_KEYS = {
   subscriptions: 'digichar_subscriptions',
   benchmarks: 'digichar_benchmarks',
   preferences: 'digichar_preferences',
+  ollamaModel: 'digichar_ollama_model',
 } as const;
 
 export function loadJson<T>(key: string, fallback: T): T {

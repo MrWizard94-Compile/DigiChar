@@ -25,6 +25,17 @@ export interface FinancialAdvisorResponse {
   monthlySubscriptionDrain: number;
   riskLevel: 'Low' | 'Medium' | 'High';
   recommendedActions: string[];
+  advisorSource: 'Ollama' | 'DigiChar local rules';
+  model: string | null;
+  fallbackNotice: string | null;
+}
+
+export interface OllamaStatus {
+  connected: boolean;
+  endpoint: string;
+  configuredModel: string;
+  installedModels: string[];
+  message: string;
 }
 
 interface NativeScrapedDeal {
@@ -388,7 +399,24 @@ export function getLocalFinancialAdvice(
     monthlySubscriptionDrain: Math.round(monthlySubscriptionDrain * 100) / 100,
     riskLevel,
     recommendedActions,
+    advisorSource: 'DigiChar local rules',
+    model: null,
+    fallbackNotice: 'Ollama is available when DigiChar runs in the desktop app.',
   };
+}
+
+function getBrowserOllamaStatus(): OllamaStatus {
+  return {
+    connected: false,
+    endpoint: 'http://127.0.0.1:11434',
+    configuredModel: 'qwen2.5:3b',
+    installedModels: [],
+    message: 'Ollama status is available from the DigiChar desktop app.',
+  };
+}
+
+export async function getOllamaStatus(): Promise<OllamaStatus> {
+  return invokeWithFallback<OllamaStatus>('ollama_status', {}, getBrowserOllamaStatus);
 }
 
 function extractRequestedAmount(query: string): number | null {
@@ -405,10 +433,11 @@ export async function askFinancialAdvisor(
   query: string,
   transactions: Transaction[],
   subscriptions: SubscriptionItem[],
+  model?: string,
 ): Promise<FinancialAdvisorResponse> {
   return invokeWithFallback<FinancialAdvisorResponse>(
     'financial_advice',
-    { query, transactions, subscriptions },
+    { query, transactions, subscriptions, model },
     () => getLocalFinancialAdvice(query, transactions, subscriptions),
   );
 }

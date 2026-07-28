@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   Sparkles, 
   Brain, 
@@ -7,7 +7,8 @@ import {
   X, 
 } from 'lucide-react';
 import { Transaction, SubscriptionItem } from '../types';
-import { askFinancialAdvisor } from '../services/desktopApi';
+import { askFinancialAdvisor, getOllamaStatus, type OllamaStatus } from '../services/desktopApi';
+import { DIGICHAR_STORAGE_KEYS, loadJson, saveJson } from '../services/persistence';
 
 interface AIAssistantProps {
   isOpen: boolean;
@@ -24,12 +25,45 @@ export const AIFinancialAssistantModal: React.FC<AIAssistantProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string | null>(() => {
+    return loadJson<string | null>(DIGICHAR_STORAGE_KEYS.ollamaModel, null);
+  });
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([
     {
       role: 'assistant',
       content: 'Hello! I am DigiChar AI, your executive dysfunction financial advisor. Ask me anything about your cashflow, impulse trends, or subscription reduction strategy!'
     }
   ]);
+
+  useEffect(() => {
+    let active = true;
+
+    void getOllamaStatus().then((status) => {
+      if (active) {
+        setOllamaStatus(status);
+        setSelectedModel((currentModel) => {
+          if (currentModel && status.installedModels.includes(currentModel)) {
+            return currentModel;
+          }
+
+          if (status.installedModels.includes(status.configuredModel)) {
+            return status.configuredModel;
+          }
+
+          return status.installedModels[0] ?? null;
+        });
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    saveJson(DIGICHAR_STORAGE_KEYS.ollamaModel, selectedModel);
+  }, [selectedModel]);
 
   if (!isOpen) return null;
 
@@ -50,10 +84,15 @@ export const AIFinancialAssistantModal: React.FC<AIAssistantProps> = ({
     setLoading(true);
 
     try {
-      const advice = await askFinancialAdvisor(text, transactions, subscriptions);
-      setMessages([...newMsgs, { role: 'assistant', content: advice.reply }]);
+      const advice = await askFinancialAdvisor(text, transactions, subscriptions, selectedModel ?? undefined);
+      const source = advice.advisorSource === 'Ollama' && advice.model
+        ? `\n\nLocal model: ${advice.model}`
+        : advice.fallbackNotice
+          ? `\n\n${advice.fallbackNotice}`
+          : '';
+      setMessages([...newMsgs, { role: 'assistant', content: `${advice.reply}${source}` }]);
     } catch {
-      setMessages([...newMsgs, { role: 'assistant', content: 'DigiChar AI is analyzing your offline ledger data. Your safe-to-spend buffer looks solid!' }]);
+      setMessages([...newMsgs, { role: 'assistant', content: 'DigiChar could not complete that advisor request. Your local ledger data was not sent to a cloud service.' }]);
     } finally {
       setLoading(false);
     }
@@ -67,8 +106,8 @@ export const AIFinancialAssistantModal: React.FC<AIAssistantProps> = ({
           <div className="flex items-center space-x-2 text-cyan-400">
             <Brain className="w-5 h-5" />
             <div>
-              <h3 className="text-lg font-bold text-slate-100">Phase 10 — DigiChar AI Assistant</h3>
-              <p className="text-[11px] text-slate-400">Executive Dysfunction Financial Advisor</p>
+              <h3 className="text-lg font-bold text-slate-100">DigiChar Ollama Advisor</h3>
+              <p className="text-[11px] text-slate-400">Private local financial reflection</p>
             </div>
           </div>
           <button
@@ -78,6 +117,28 @@ export const AIFinancialAssistantModal: React.FC<AIAssistantProps> = ({
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        <div className={`mt-3 flex items-center gap-2 text-[11px] font-mono ${ollamaStatus?.connected ? 'text-emerald-400' : 'text-amber-300'}`}>
+          <span className={`h-2 w-2 rounded-full ${ollamaStatus?.connected ? 'bg-emerald-400' : 'bg-amber-300'}`} />
+          <span>{ollamaStatus?.message ?? 'Checking local Ollama...'}</span>
+          {ollamaStatus?.connected && <span className="text-slate-500">{selectedModel ?? ollamaStatus.configuredModel}</span>}
+        </div>
+
+        <label className="mt-3 flex items-center gap-3 text-xs text-slate-300">
+          <span className="font-mono text-slate-500">Local model</span>
+          <select
+            value={selectedModel ?? ''}
+            onChange={(event) => setSelectedModel(event.target.value || null)}
+            disabled={!ollamaStatus?.connected || ollamaStatus.installedModels.length === 0 || loading}
+            className="min-w-0 flex-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 font-mono text-xs text-slate-100 focus:outline-none focus:border-cyan-500 disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label="Ollama model"
+          >
+            {!selectedModel && <option value="">No installed model available</option>}
+            {ollamaStatus?.installedModels.map((model) => (
+              <option key={model} value={model}>{model}</option>
+            ))}
+          </select>
+        </label>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto my-4 space-y-3 pr-2 scrollbar-thin">
