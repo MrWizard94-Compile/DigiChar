@@ -349,7 +349,7 @@ export default function App() {
           <span>DigiChar v3.0.0 — Production Desktop Financial OS</span>
         </div>
         <div>
-          SOUL v2.0.0 Standard Compliant • Low Executive Friction Architecture
+          Local-first design • Low executive friction
         </div>
       </footer>
     </div>

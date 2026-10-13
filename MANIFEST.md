@@ -2,7 +2,8 @@
 
 ## Governance
 
-- `SOUL.md` - Project-local copy of the WPAI SOUL v2.0.0 constitution.
+- `AGENTS.md` - Current project entry pinned to the canonical WPAI Constitution.
+- The retired SOUL v2.0.0 copy remains recoverable from Git history.
 
 ## Desktop Shell
 
@@ -17,7 +18,7 @@
 
 - `src/services/desktopApi.ts` - Native command bridge with deterministic preview fallbacks.
 - `src/services/persistence.ts` - Guarded local persistence helpers.
-- `src/App.tsx` - Uses guarded persistence and correct SOUL version label.
+- `src/App.tsx` - Uses guarded persistence and product-specific status text.
 - `src/main.tsx` - Validates the React root element before rendering.
 - `src/components/TauriWindowHeader.tsx` - Real desktop window controls and dragging.
 - `src/components/AIFinancialAssistantModal.tsx` - Desktop-native financial advice flow.
