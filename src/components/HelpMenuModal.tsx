@@ -195,7 +195,7 @@ export const HelpMenuModal: React.FC<HelpMenuModalProps> = ({
                 <div className="p-4 bg-gradient-to-br from-cyan-950/60 to-slate-900 border border-cyan-800/60 rounded-2xl space-y-2">
                   <h4 className="text-base font-bold text-cyan-300 flex items-center space-x-2">
                     <Sparkles className="w-4 h-4 text-cyan-400" />
-                    <span>DigiChar Core Philosophy: SOUL IS LAW</span>
+                    <span>DigiChar Core Philosophy: Clarity First</span>
                   </h4>
                   <p className="text-xs text-slate-300 leading-relaxed">
                     DigiChar is designed specifically for neurodivergent individuals and anyone suffering from financial decision fatigue. Instead of forcing you to decipher dense, spreadsheet-style multi-row accounting tables, DigiChar isolates <strong>ONE actionable decision</strong> at a time.

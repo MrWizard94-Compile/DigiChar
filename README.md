@@ -69,4 +69,7 @@ DigiChar stores transactions, subscriptions, benchmarks, preferences, and the se
 
 ## Governance
 
-`SOUL.md` is copied from `C:\WPAI\SOULv2.0.0.md` and is the governing production standard for this repo.
+[`AGENTS.md`](AGENTS.md) is DigiChar's project-specific entry point. It pins
+the accepted [WPAI Constitution](https://github.com/MrWizard94-Compile/Agents-Constitution)
+commit and explains the source, verification, and financial-data boundaries.
+The historical SOUL copy is recoverable from Git; it is not active law.

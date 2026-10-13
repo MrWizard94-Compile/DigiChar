@@ -2,11 +2,14 @@
 
 Audit date: 2026-07-25
 
+Historical migration record. Current governance and verification boundaries
+are in `AGENTS.md`; this report does not certify current installed-app behavior.
+
 ## Scope
 
 - Current repo target: `C:\Users\Bulkl\OneDrive\Documents\DigiChar`
 - Source app found at: `C:\WPAI\Software\digichar`
-- Governance read first: `C:\WPAI\SOULv2.0.0.md`
+- Governance read first at the time: the WPAI SOUL v2.0.0 monolith.
 - Baseline source check: `npm run lint` passed in `C:\WPAI\Software\digichar`
 
 ## Findings
@@ -25,7 +28,8 @@ Audit date: 2026-07-25
 
 - Migrated source files into this repo while excluding `node_modules`, logs, build output, and real env files.
 - Initialized Git branch naming to `main` and set `origin` to `https://github.com/MrWizard94-Compile/DigiChar.git`.
-- Added `SOUL.md` exactly from the WPAI governance source.
+- Vendored the then-current SOUL v2.0.0, later retired in favor of the
+  pinned canonical WPAI Constitution entry in `AGENTS.md`.
 - Replaced Express/Gemini server architecture with Tauri 2 and Rust commands.
 - Added deterministic local fallbacks for browser preview and tests.
 - Wired former HTTP features through `src/services/desktopApi.ts`.
