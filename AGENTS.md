@@ -26,8 +26,9 @@ DigiChar-specific requirements; it is not another constitutional copy.
 
 For governance-only edits, validate the pinned Constitution source and its
 tests, run `tools/check-adoption.py` against this Git root, then run
-`npm run check` and `npm run build`. Those checks cover TypeScript, smoke tests,
-Rust unit tests, and the frontend bundle; they do not prove a packaged desktop
+`npm audit --audit-level=low`, `npm run check`, and `npm run build`. Those checks
+cover all locked dependencies, TypeScript, smoke tests, Rust unit tests, and
+the frontend bundle; they do not prove a packaged desktop
 binary, installed-state safety, or financial-advice correctness in real use.
 Changes affecting native packaging require `npm run desktop:build` and an
 installed-app check on the intended Windows device.

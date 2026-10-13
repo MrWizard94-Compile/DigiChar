@@ -54,6 +54,9 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
+      - name: Audit all dependencies
+        run: npm audit --audit-level=low
+
       - name: TypeScript, smoke, and Rust unit checks
         run: npm run check
 

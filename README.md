@@ -35,6 +35,7 @@ npm run desktop:dev
 Run verification:
 
 ```powershell
+npm audit --audit-level=low
 npm run check
 ```
 
